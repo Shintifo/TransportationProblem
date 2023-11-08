@@ -4,7 +4,6 @@ import numpy as np
 def north_west(supply, demand, cost):
 	s = np.copy(supply)
 	d = np.copy(demand)
-	c = np.copy(cost)
 	current_state = (0, 0)
 	distribution = np.zeros(shape=c.shape)
 	total_cost = 0
@@ -19,13 +18,12 @@ def north_west(supply, demand, cost):
 		d[y] -= distribution[current_state]
 		total_cost += distribution[current_state] * c[current_state]
 		current_state = next_state
-	print("Total cost: ", total_cost)
+	print("Total cost:", total_cost)
 
 
 def russel(supply, demand, cost):
 	s = np.copy(supply)
 	d = np.copy(demand)
-	c = np.copy(cost)
 	total_cost = 0
 	distribution = np.zeros(shape=c.shape)
 
@@ -48,16 +46,11 @@ def russel(supply, demand, cost):
 def vogel(supply, demand, cost):
 	s = np.copy(supply)
 	d = np.copy(demand)
-	c = np.copy(cost)
 	min_column_values = np.min(c, axis=0)
 	second_column_min_values = np.partition(c, 1, axis=0)[1]
 
 	min_row_values = np.min(c, axis=1)
 	second_min_row_values = np.partition(c, 1, axis=1)[:, 1]
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -67,6 +60,5 @@ if __name__ == '__main__':
 				  [2, 6, 5, 9],
 				  [8, 3, 3, 2]])
 
-
-	# north_west(s, d, c)
-	# russel(s, d, c)
+	north_west(s, d, c)
+	russel(s, d, c)
