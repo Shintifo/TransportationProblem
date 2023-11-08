@@ -61,7 +61,6 @@ def vogel(supply, demand, cost):
 
 
 if __name__ == '__main__':
-	# TODO: define M
 	s = np.array([300, 400, 500])
 	d = np.array([250, 350, 400, 200])
 	c = np.array([[3, 1, 7, 4],
