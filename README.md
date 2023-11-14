@@ -4,9 +4,9 @@
 ## About The Project
 Implementation of solution for the transportation problem using 3 different methods.
 
-a. North-West corner method,
-b. Vogel’s approximation method,
-c. Russell’s approximation method.
+1. North-West corner method,
+2. Vogel’s approximation method,
+3. Russell’s approximation method.
 
 
 ### Built With
@@ -33,7 +33,7 @@ The input contains:
 
 Input Example:
 For the problem\
-#TODO
+#TODO\
 the input.txt file should look like this:\
 #TODO
 
@@ -42,14 +42,11 @@ Running the code:
     python main.py
 
 Output format:
-* A vector of decision variables - x
-* Maximum (minimum) value of the objective function.
 
 * The string ”The method is not applicable!”
 or  The string ”The problem is not balanced!”
 or Print (demonstrate) input parameter table (a table constructed using matrix C, vectors S and D).
-* 3 vectors of initial basic feasible solution - x
-0 using North-West corner method, Vogel’s
+* 3 vectors of initial basic feasible solution x0 using North-West corner method, Vogel’s
 approximation method, and Russell’s approximation method
 
 Example output:
