@@ -7,6 +7,7 @@ def log(message):
 
 
 def north_west(supply, demand, cost):
+	vector = []
 	log("North-West:")
 	s = np.copy(supply)
 	d = np.copy(demand)
@@ -16,7 +17,7 @@ def north_west(supply, demand, cost):
 	while current_state[0] < s.shape[0] and current_state[1] < d.shape[0]:
 		x, y = current_state
 		distribution[current_state] = min(s[x], d[y])
-
+		vector.append(int(distribution[current_state]))
 		next_move = (1, 0) if distribution[current_state] == s[x] else (0, 1)
 		next_state = tuple(map(sum, zip(current_state, next_move)))
 
@@ -24,22 +25,36 @@ def north_west(supply, demand, cost):
 		d[y] -= distribution[current_state]
 		total_cost += distribution[current_state] * cost[current_state]
 		current_state = next_state
-	log(f"Distribution:\n {distribution}")
-	log(f"Total cost: {total_cost}\n")
+	log(f"Vector:\n {vector}")
+	# log(f"Distribution:\n {distribution}")
+	# log(f"Total cost: {total_cost}\n")
 
 
 def russel(supply, demand, cost):
 	log("Russel rule:")
 	s = np.copy(supply)
 	d = np.copy(demand)
+	c = np.copy(cost)
 	total_cost = 0
-	distribution = np.zeros(shape=cost.shape)
 
-	min_rows = cost.max(axis=1)
-	min_columns = cost.max(axis=0)
-	delta = cost - min_columns - min_rows[:, np.newaxis]
+	distribution = np.zeros(shape=c.shape)
+
+
 
 	while np.any(s != 0) and np.any(d != 0):
+		max_rows = c.max(axis=1)
+		max_columns = c.max(axis=0)
+
+		rows_indices = np.where(np.isinf(max_rows))
+		columns_indices = np.where(np.isinf(max_columns))
+		max_columns[columns_indices] = 0
+		max_rows[rows_indices] = 0
+
+		delta = c - max_columns - max_rows[:, np.newaxis]
+		inf_indices = np.where(np.isinf(delta))
+		delta[inf_indices] = np.inf
+
+
 		min_val = np.unravel_index(delta.argmin(), delta.shape)
 		delta[min_val] = 0
 		if s[min_val[0]] == d[min_val[1]] == 0:
@@ -47,8 +62,13 @@ def russel(supply, demand, cost):
 		distribution[min_val] = min(s[min_val[0]], d[min_val[1]])
 		s[min_val[0]] -= distribution[min_val]
 		d[min_val[1]] -= distribution[min_val]
-		total_cost += distribution[min_val] * cost[min_val]
-	log(f"Distribution:\n {distribution}")
+		total_cost += distribution[min_val] * c[min_val]
+		if s[min_val[0]] == 0:
+			c[min_val[0]] = -np.inf
+		elif d[min_val[1]] == 0:
+			c[:, min_val[1]] = -np.inf
+
+	# log(f"Distribution:\n {distribution}")
 	log(f"Total cost: {total_cost},\n")
 
 
@@ -118,6 +138,7 @@ def vogel(supply, demand, cost):
 			return cost
 
 		distribution[location] = min(d[column_index], s[row_index])
+		vector.append(int(distribution[location]))
 		cost += distribution[location] * c[location]
 
 		if d[column_index] < s[row_index]:
@@ -138,6 +159,7 @@ def vogel(supply, demand, cost):
 	s = np.copy(supply)
 	d = np.copy(demand)
 	c = np.copy(cost)
+	vector = []
 	distribution = np.zeros(shape=cost.shape)
 	total_cost = 0
 
@@ -145,13 +167,15 @@ def vogel(supply, demand, cost):
 		total_cost = apply_choose(columns(), total_cost)
 		total_cost = apply_choose(rows(), total_cost)
 
+	log(f"Vector:\n {vector}")
 	log(f"Distribution:\n {distribution}")
 	log(f"Total cost: {total_cost},\n")
 
 
 LOG = True
 
-def input(file_path) :
+
+def input(file_path):
 	try:
 		with open(file_path, "r") as file:
 			supply = np.array(file.readline().split()).astype(int)
@@ -165,15 +189,27 @@ def input(file_path) :
 		return None
 
 
+def print_parameter_table(s, d, c):
+	print("Initial parameter table:")
+	print("  I   II   III   IV | S:")
+	for i in range(3):
+		for j in range(4):
+			print(f"  {int(c[i][j])}  ", end="")
+		print(f"| {s[i]}")
+	print("D:", end="")
+	for i in range(4):
+		print(f" {int(d[i])} ", end="")
+	print("\n")
+
+
 if __name__ == '__main__':
 	s, d, c = input("input.txt")
+	print_parameter_table(s, d, c)
 
-	print(s)
-	print(d)
-	print(c)
-
+	# print(s)
+	# print(d)
+	# print(c)
 	# TODO output
-
-	north_west(s, d, c)
-	vogel(s, d, c)
+	# north_west(s, d, c)
+	# vogel(s, d, c)
 	russel(s, d, c)
