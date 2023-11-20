@@ -35,7 +35,15 @@ Input Example:
 For the problem\
 #TODO\
 the input.txt file should look like this:\
-#TODO
+
+    #A vector of coefficients of supply:
+    10 7 8
+    #A vector of coefficients of demand:
+    5 9 8 3
+    #A matrix of coefficients of costs:
+    2 4 5 3
+    1 2 5 4
+    3 5 2 1
 
 Running the code:
 
@@ -50,8 +58,25 @@ or Print (demonstrate) input parameter table (a table constructed using matrix C
 approximation method, and Russell’s approximation method
 
 Example output:
-    
-    #TODO
+
+    Initial table:
+    ╒═════╤═════╤═════╤═════╤═════╕
+    │  1  │  2  │  3  │  4  │  S  │
+    ╞═════╪═════╪═════╪═════╪═════╡
+    │  2  │  4  │  5  │  3  │ 10  │
+    ├─────┼─────┼─────┼─────┼─────┤
+    │  1  │  2  │  5  │  4  │  7  │
+    ├─────┼─────┼─────┼─────┼─────┤
+    │  3  │  5  │  2  │  1  │  8  │
+    ├─────┼─────┼─────┼─────┼─────┤
+    │  5  │  9  │  8  │  3  │     │
+    ╘═════╧═════╧═════╧═════╧═════╛
+    North-West:
+    [5, 5, 0, 0, 0, 4, 3, 0, 0, 0, 5, 3]
+    Vogel rule:
+    [5, 2, 0, 3, 0, 7, 0, 0, 0, 0, 8, 0]
+    Russel rule:
+    [5, 2, 0, 3, 0, 7, 0, 0, 0, 0, 8, 0]
 
 <!---
 ## Options
