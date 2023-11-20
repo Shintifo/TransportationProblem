@@ -17,7 +17,6 @@ def north_west(supply, demand, cost):
 	while current_state[0] < s.shape[0] and current_state[1] < d.shape[0]:
 		x, y = current_state
 		distribution[current_state] = min(s[x], d[y])
-		vector.append(int(distribution[current_state]))
 		next_move = (1, 0) if distribution[current_state] == s[x] else (0, 1)
 		next_state = tuple(map(sum, zip(current_state, next_move)))
 
@@ -25,9 +24,10 @@ def north_west(supply, demand, cost):
 		d[y] -= distribution[current_state]
 		total_cost += distribution[current_state] * cost[current_state]
 		current_state = next_state
-	log(f"Vector:\n {vector}")
-	# log(f"Distribution:\n {distribution}")
-	# log(f"Total cost: {total_cost}\n")
+	for row in distribution:
+		for cell in row:
+			vector.append(int(cell))
+	log(f"{vector}")
 
 
 def russel(supply, demand, cost):
@@ -36,10 +36,9 @@ def russel(supply, demand, cost):
 	d = np.copy(demand)
 	c = np.copy(cost)
 	total_cost = 0
+	vector = []
 
 	distribution = np.zeros(shape=c.shape)
-
-
 
 	while np.any(s != 0) and np.any(d != 0):
 		max_rows = c.max(axis=1)
@@ -54,7 +53,6 @@ def russel(supply, demand, cost):
 		inf_indices = np.where(np.isinf(delta))
 		delta[inf_indices] = np.inf
 
-
 		min_val = np.unravel_index(delta.argmin(), delta.shape)
 		delta[min_val] = 0
 		if s[min_val[0]] == d[min_val[1]] == 0:
@@ -68,8 +66,10 @@ def russel(supply, demand, cost):
 		elif d[min_val[1]] == 0:
 			c[:, min_val[1]] = -np.inf
 
-	# log(f"Distribution:\n {distribution}")
-	log(f"Total cost: {total_cost},\n")
+	for row in distribution:
+		for cell in row:
+			vector.append(int(cell))
+	log(f"{vector}")
 
 
 def vogel(supply, demand, cost):
@@ -138,7 +138,6 @@ def vogel(supply, demand, cost):
 			return cost
 
 		distribution[location] = min(d[column_index], s[row_index])
-		vector.append(int(distribution[location]))
 		cost += distribution[location] * c[location]
 
 		if d[column_index] < s[row_index]:
@@ -164,12 +163,13 @@ def vogel(supply, demand, cost):
 	total_cost = 0
 
 	while np.any(s != 0) and np.any(d != 0):
-		total_cost = apply_choose(columns(), total_cost)
 		total_cost = apply_choose(rows(), total_cost)
+		total_cost = apply_choose(columns(), total_cost)
 
-	log(f"Vector:\n {vector}")
-	log(f"Distribution:\n {distribution}")
-	log(f"Total cost: {total_cost},\n")
+	for row in distribution:
+		for cell in row:
+			vector.append(int(cell))
+	log(f"{vector}")
 
 
 LOG = True
@@ -206,10 +206,6 @@ if __name__ == '__main__':
 	s, d, c = input("input.txt")
 	print_parameter_table(s, d, c)
 
-	# print(s)
-	# print(d)
-	# print(c)
-	# TODO output
-	# north_west(s, d, c)
-	# vogel(s, d, c)
+	north_west(s, d, c)
+	vogel(s, d, c)
 	russel(s, d, c)
