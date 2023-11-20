@@ -1,4 +1,5 @@
 import numpy as np
+from tabulate import tabulate
 
 
 def log(message):
@@ -27,7 +28,7 @@ def north_west(supply, demand, cost):
 	for row in distribution:
 		for cell in row:
 			vector.append(int(cell))
-	log(f"{vector}")
+	log(vector)
 
 
 def russel(supply, demand, cost):
@@ -37,17 +38,14 @@ def russel(supply, demand, cost):
 	c = np.copy(cost)
 	total_cost = 0
 	vector = []
-
 	distribution = np.zeros(shape=c.shape)
 
 	while np.any(s != 0) and np.any(d != 0):
 		max_rows = c.max(axis=1)
 		max_columns = c.max(axis=0)
 
-		rows_indices = np.where(np.isinf(max_rows))
-		columns_indices = np.where(np.isinf(max_columns))
-		max_columns[columns_indices] = 0
-		max_rows[rows_indices] = 0
+		max_columns[np.where(np.isinf(max_columns))] = 0
+		max_rows[np.where(np.isinf(max_rows))] = 0
 
 		delta = c - max_columns - max_rows[:, np.newaxis]
 		inf_indices = np.where(np.isinf(delta))
@@ -55,12 +53,15 @@ def russel(supply, demand, cost):
 
 		min_val = np.unravel_index(delta.argmin(), delta.shape)
 		delta[min_val] = 0
+
 		if s[min_val[0]] == d[min_val[1]] == 0:
 			continue
+
 		distribution[min_val] = min(s[min_val[0]], d[min_val[1]])
 		s[min_val[0]] -= distribution[min_val]
 		d[min_val[1]] -= distribution[min_val]
 		total_cost += distribution[min_val] * c[min_val]
+
 		if s[min_val[0]] == 0:
 			c[min_val[0]] = -np.inf
 		elif d[min_val[1]] == 0:
@@ -69,53 +70,21 @@ def russel(supply, demand, cost):
 	for row in distribution:
 		for cell in row:
 			vector.append(int(cell))
-	log(f"{vector}")
+	log(vector)
 
 
 def vogel(supply, demand, cost):
-	"""
-	How "columns()" and "rows()" function works?
-
-	It finds min and second min values in each column or row, depending on the function.
-	As matrix may have infinity both in rows and columns (that have been already distributed),
-	It replaces infinity in second_min_values with 0
-	and in penalties with -inf, to prevent from operations like:
-		1) np.inf - np.inf
-		2) np.inf - n (n = any number)
-	For example:
-		Matrix of costs:
-		inf  inf  inf  inf
-		inf   6    5    9
-		inf  inf  inf inf
-	Therefore:
-			min_column = [inf, 6, 5, 9]
-			second_min_column = [0, 0, 0, 0]
-			penalty = [-inf, 6, 5 ,9]
-
-	Hence, columns with fully distributed demand and rows with distributed supply are not considered.
-
-	After that, do not do anything special, but ordinary steps of Vogel rule
-
-
-	:param supply: Vector of supply
-	:param demand: Vector of demand
-	:param cost: Matrix of cost between supplies and demands
-	"""
-
-	def col():
+	def col() -> list[int]:
 		min_column_values = np.min(c, axis=0)
 
 		second_column_min_values = np.partition(c, 1, axis=0)[1]
-		# Replace np.inf with 0
 		second_column_min_values[np.isinf(second_column_min_values)] = 0
 
 		column_penalties = abs(second_column_min_values - min_column_values)
-		# Replace np.inf with -np.inf
 		column_penalties[np.isinf(column_penalties)] = -np.inf
 		return column_penalties
 
-
-	def row():
+	def row() -> list[int]:
 		min_row_values = np.min(c, axis=1)
 
 		second_min_row_values = np.partition(c, 1, axis=1)[:, 1]
@@ -125,7 +94,15 @@ def vogel(supply, demand, cost):
 		rows_penalties[np.isinf(rows_penalties)] = -np.inf
 		return rows_penalties
 
-	def apply_choose(cost: int) -> int:
+	log("Vogel rule:")
+	s = np.copy(supply)
+	d = np.copy(demand)
+	c = np.copy(cost)
+	vector = []
+	distribution = np.zeros(shape=cost.shape)
+	total_cost = 0
+
+	while np.any(s != 0) and np.any(d != 0):
 		column_penalties = col()
 		rows_penalties = row()
 
@@ -141,10 +118,10 @@ def vogel(supply, demand, cost):
 		row_index, column_index = location
 
 		if d[column_index] == s[row_index] == 0:
-			return cost
+			break
 
 		distribution[location] = min(d[column_index], s[row_index])
-		cost += distribution[location] * c[location]
+		total_cost += distribution[location] * c[location]
 
 		if d[column_index] < s[row_index]:
 			c[:, column_index] = np.inf
@@ -158,61 +135,39 @@ def vogel(supply, demand, cost):
 
 		d[column_index] -= distribution[location]
 		s[row_index] -= distribution[location]
-		return cost
-
-	log("Vogel rule:")
-	s = np.copy(supply)
-	d = np.copy(demand)
-	c = np.copy(cost)
-	vector = []
-	distribution = np.zeros(shape=cost.shape)
-	total_cost = 0
-
-	while np.any(s != 0) and np.any(d != 0):
-		total_cost = apply_choose(total_cost)
-		# total_cost = apply_choose(columns(), total_cost)
-		# total_cost = apply_choose(rows(), total_cost)
 
 	for row in distribution:
 		for cell in row:
 			vector.append(int(cell))
-	log(f"{vector}")
-
-
-LOG = True
+	log(vector)
 
 
 def input(file_path):
-	try:
-		with open(file_path, "r") as file:
-			supply = np.array(file.readline().split()).astype(int)
-			demand = np.array(file.readline().split()).astype(int)
-			cost = np.loadtxt(file)
-			cost = cost.reshape(3, 4)
-			return supply, demand, cost
-
-	except Exception as e:
-		print(e)
-		return None
+	with open(file_path, "r") as file:
+		supply = np.loadtxt(file, max_rows=1, skiprows=1)
+		demand = np.loadtxt(file, max_rows=1, skiprows=1)
+		cost = np.loadtxt(file, skiprows=1).reshape(3, 4)
+		return supply, demand, cost
 
 
 def print_parameter_table(s, d, c):
-	print("Initial parameter table:")
-	print("  I   II   III   IV | S:")
-	for i in range(3):
-		for j in range(4):
-			print(f"  {int(c[i][j])}  ", end="")
-		print(f"| {s[i]}")
-	print("D:", end="")
-	for i in range(4):
-		print(f" {int(d[i])} ", end="")
-	print("\n")
+	log("Initial table:")
+	table_list = np.column_stack((c, s)).tolist()
+	table_list.append(d.tolist())
 
+	headers = ['1', '2', '3', '4', 'S']
+	table_format_options = {'numalign': 'center', 'stralign': 'center'}
+
+	print(tabulate(table_list, headers, tablefmt="fancy_grid",
+				   **table_format_options))
+
+
+LOG = True
 
 if __name__ == '__main__':
 	s, d, c = input("input.txt")
 	print_parameter_table(s, d, c)
 
-	# north_west(s, d, c)
+	north_west(s, d, c)
 	vogel(s, d, c)
-	# russel(s, d, c)
+	russel(s, d, c)
