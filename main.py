@@ -102,7 +102,7 @@ def vogel(supply, demand, cost):
 	:param cost: Matrix of cost between supplies and demands
 	"""
 
-	def columns() -> tuple:
+	def col():
 		min_column_values = np.min(c, axis=0)
 
 		second_column_min_values = np.partition(c, 1, axis=0)[1]
@@ -112,12 +112,10 @@ def vogel(supply, demand, cost):
 		column_penalties = abs(second_column_min_values - min_column_values)
 		# Replace np.inf with -np.inf
 		column_penalties[np.isinf(column_penalties)] = -np.inf
+		return column_penalties
 
-		column_index = np.argmax(column_penalties)
-		row_index = np.argmin(c[:, column_index])
-		return row_index, column_index
 
-	def rows() -> tuple:
+	def row():
 		min_row_values = np.min(c, axis=1)
 
 		second_min_row_values = np.partition(c, 1, axis=1)[:, 1]
@@ -125,13 +123,21 @@ def vogel(supply, demand, cost):
 
 		rows_penalties = abs(second_min_row_values - min_row_values)
 		rows_penalties[np.isinf(rows_penalties)] = -np.inf
+		return rows_penalties
 
-		row_index = np.argmax(rows_penalties)
-		column_index = np.argmin(c[row_index])
-		location = (row_index, column_index)
-		return location
+	def apply_choose(cost: int) -> int:
+		column_penalties = col()
+		rows_penalties = row()
 
-	def apply_choose(location: tuple, cost: int) -> int:
+		if max(column_penalties) < max(rows_penalties):
+			row_index = np.argmax(rows_penalties)
+			column_index = np.argmin(c[row_index])
+			location = (row_index, column_index)
+		else:
+			column_index = np.argmax(column_penalties)
+			row_index = np.argmin(c[:, column_index])
+			location = (row_index, column_index)
+
 		row_index, column_index = location
 
 		if d[column_index] == s[row_index] == 0:
@@ -163,8 +169,9 @@ def vogel(supply, demand, cost):
 	total_cost = 0
 
 	while np.any(s != 0) and np.any(d != 0):
-		total_cost = apply_choose(rows(), total_cost)
-		total_cost = apply_choose(columns(), total_cost)
+		total_cost = apply_choose(total_cost)
+		# total_cost = apply_choose(columns(), total_cost)
+		# total_cost = apply_choose(rows(), total_cost)
 
 	for row in distribution:
 		for cell in row:
@@ -206,6 +213,6 @@ if __name__ == '__main__':
 	s, d, c = input("input.txt")
 	print_parameter_table(s, d, c)
 
-	north_west(s, d, c)
+	# north_west(s, d, c)
 	vogel(s, d, c)
-	russel(s, d, c)
+	# russel(s, d, c)
