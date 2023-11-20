@@ -151,16 +151,28 @@ def vogel(supply, demand, cost):
 
 LOG = True
 
-if __name__ == '__main__':
-	# TODO input
-	# TODO output
+def input(file_path) :
+	try:
+		with open(file_path, "r") as file:
+			supply = np.array(file.readline().split()).astype(int)
+			demand = np.array(file.readline().split()).astype(int)
+			cost = np.loadtxt(file)
+			cost = cost.reshape(3, 4)
+			return supply, demand, cost
 
-	# Note: In cost matrix c[0] - 1st row, c[1] - 2nd row etc.
-	s = np.array([300, 400, 500])
-	d = np.array([250, 350, 400, 200])
-	c = np.array([[3, 1, 7, 4],
-					  	[2, 6, 5, 9],
-					  	[8, 3, 3, 2]], dtype=float)
+	except Exception as e:
+		print(e)
+		return None
+
+
+if __name__ == '__main__':
+	s, d, c = input("input.txt")
+
+	print(s)
+	print(d)
+	print(c)
+
+	# TODO output
 
 	north_west(s, d, c)
 	vogel(s, d, c)
