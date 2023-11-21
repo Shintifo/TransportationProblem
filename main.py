@@ -153,7 +153,7 @@ def input(file_path):
 		print("The method is not applicable!")
 		exit(1)
 	if sum(supply) != sum(demand):
-		print("he problem is not balanced")
+		print("The problem is not balanced!")
 		exit(1)
 
 	return supply, demand, cost
