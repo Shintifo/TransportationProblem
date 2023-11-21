@@ -148,7 +148,8 @@ def input(file_path):
 		demand = np.loadtxt(file, max_rows=1, skiprows=1)
 		cost = np.loadtxt(file, skiprows=1)
 
-	if cost.shape[0] != supply.shape or cost.shape[1] != demand.shape:
+	if (cost.shape[0] != supply.shape[0] or cost.shape[1] != demand.shape[0]
+			or np.any(cost == 0) or np.any(demand == 0)):
 		print("The method is not applicable!")
 		exit(1)
 	if sum(supply) != sum(demand):
