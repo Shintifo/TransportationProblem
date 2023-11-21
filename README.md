@@ -32,9 +32,15 @@ The input contains:
 * A vector of coefficients of demand - D.
 
 Input Example:
-For the problem\
-#TODO\
-the input.txt file should look like this:\
+
+| Source    | B1 | B2 | B3 | B4 | Supply |
+| --------- | -- | -- | -- | -- | ------ |
+| A1        | 2 | 4 | 5 | 3 | 10 |
+| A2        | 1 | 2 | 5 | 4 | 7 |
+| A3        | 3 | 5 | 2 | 1 | 8 |
+| Demand    | 5 | 9 | 8 | 3 | 25 |
+
+the input.txt file should look like this:
 
     #A vector of coefficients of supply:
     10 7 8
