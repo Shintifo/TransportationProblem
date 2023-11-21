@@ -146,8 +146,16 @@ def input(file_path):
 	with open(file_path, "r") as file:
 		supply = np.loadtxt(file, max_rows=1, skiprows=1)
 		demand = np.loadtxt(file, max_rows=1, skiprows=1)
-		cost = np.loadtxt(file, skiprows=1).reshape(3, 4)
-		return supply, demand, cost
+		cost = np.loadtxt(file, skiprows=1)
+
+	if cost.shape[0] != supply.shape or cost.shape[1] != demand.shape:
+		print("The method is not applicable!")
+		exit(1)
+	if sum(supply) != sum(demand):
+		print("he problem is not balanced")
+		exit(1)
+
+	return supply, demand, cost
 
 
 def print_parameter_table(s, d, c):

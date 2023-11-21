@@ -1,8 +1,8 @@
-#A vector of coefficients of supply:
-10 7 8
-#A vector of coefficients of demand:
-5 9 8 3
-#A matrix of coefficients of costs:
-2 4 5 3
-1 2 5 4
-3 5 2 1
+supply:
+160 140 170
+demand:
+120 50 190 110
+matrix:
+7 8 1 2
+4 5 9 8
+9 2 3 6
